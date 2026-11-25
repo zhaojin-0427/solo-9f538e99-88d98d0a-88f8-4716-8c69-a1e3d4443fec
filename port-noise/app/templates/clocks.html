@@ -46,7 +46,16 @@ document.querySelectorAll('.correct-form').forEach(form => {
       body: JSON.stringify(payload)
     });
     const data = await resp.json();
-    document.getElementById('correct-out').textContent = JSON.stringify(data, null, 2);
+    let text = '';
+    if (resp.ok) {
+      text = data.revoked_form_nos && data.revoked_form_nos.length
+        ? `更正已生效（事件 #${data.correction_event}），撤销单号：${data.revoked_form_nos.join('、')}\n\n`
+        : `更正已生效（事件 #${data.correction_event}），无撤销单。\n\n`;
+    } else if (data.conflict_records) {
+      text = `更正被拒绝，冲突记录：${data.conflict_records.join('、')}；数据与复核单未改动。\n\n`;
+    }
+    document.getElementById('correct-out').textContent =
+      text + JSON.stringify(data, null, 2);
     if (resp.ok) setTimeout(() => location.reload(), 1000);
   });
 });

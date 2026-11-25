@@ -10,6 +10,9 @@ def get_db():
         conn = sqlite3.connect(
             current_app.config["DATABASE"],
             detect_types=sqlite3.PARSE_DECLTYPES,
+            # 自动提交模式：所有事务显式 BEGIN/BEGIN IMMEDIATE，
+            # 核定顺序由写锁获取先后（= 事件入库先后）保证
+            isolation_level=None,
         )
         conn.row_factory = sqlite3.Row
         conn.execute("PRAGMA foreign_keys = ON")
